@@ -32,7 +32,8 @@
     
     Люди с заболеваниями дыхательной системы (астма, аллергия).
 # Схема проекта
-![Air-quality-4-you drawio(1)](https://github.com/user-attachments/assets/37e52eb1-aaf3-432b-9d51-911b37557598)
+![Air-quality-4-you drawio(2)](https://github.com/user-attachments/assets/202956c8-5c76-45a8-8af8-42c536cec95a)
+
 
 
 # Как запустить проект на своем компьютере?
