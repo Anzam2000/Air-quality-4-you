@@ -1,16 +1,22 @@
 from telebot import types
-
-
 class AirQualityView:
     @staticmethod
     def send_welcome(message, bot):
         markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+        btn2 = types.KeyboardButton("Отправляй качество воздуха раз в день")
+        btn3 = types.KeyboardButton("Отправляй качество воздуха только сейчас")
         btn_location = types.KeyboardButton("Отправить местоположение 📍", request_location=True)
-        markup.add(btn_location)
+        markup.add(btn_location, btn2, btn3)
         bot.send_message(message.chat.id,
                          "Привет! Нажми кнопку ниже, чтобы поделиться своим местоположением.",
                          reply_markup=markup)
 
+    @staticmethod
+    def send(message, bot):
+        bot.send_message(message.chat.id, "Теперь отправь гео")
+    @staticmethod
+    def send_day(message, bot):
+        bot.send_message(message.chat.id,"Теперь отправь гео.")
     @staticmethod
     def send_air_quality_data(message, bot, aqi_data, interpret_func):
         aqi = aqi_data["list"][0]["main"]["aqi"]
