@@ -27,15 +27,15 @@ class AirQualityModel:
 class DataBase:
     def __init__(self, db_path='my_database.db'):
         self.db_path = db_path
-        self._init_db()
+        self.create_tables()
 
-    def _init_db(self):
+    def create_tables(self):
         connection = sl.connect(self.db_path)
         cursor = connection.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS Users (
-                id INTEGER PRIMARY KEY,
-                username TEXT NOT NULL UNIQUE,
+                user_id INTEGER PRIMARY KEY,
+                username TEXT NOT NULL,
                 registration_date TEXT,
                 aqi_levels TEXT
             )
@@ -43,14 +43,19 @@ class DataBase:
         connection.commit()
         connection.close()
 
-    def insert_user(self, username, aqi_level):
-        current_date = datetime.now().strftime('%m-%d')
+    def insert_user(self, user_id, username, aqi_level):
+        current_date = datetime.now().strftime('%m-%d %H:%M')
+
         connection = sl.connect(self.db_path)
         cursor = connection.cursor()
         cursor.execute('''
-            INSERT OR IGNORE INTO Users (username, registration_date, aqi_levels)
-            VALUES (?, ?, ?)
-        ''', (username, current_date, str(aqi_level)))
+            INSERT INTO Users (user_id, username, registration_date, aqi_levels)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                username = excluded.username,
+                registration_date = excluded.registration_date,
+                aqi_levels = excluded.aqi_levels
+        ''', (user_id, username, current_date, str(aqi_level)))
         connection.commit()
         connection.close()
 
