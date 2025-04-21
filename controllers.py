@@ -28,12 +28,37 @@ class AirQualityController:
                         lat = message.location.latitude
                         lon = message.location.longitude
                         air_quality_data = self.model.get_air_quality(lat, lon)
+                        aqi = air_quality_data["list"][0]["main"]["aqi"]
                         self.view.send_air_quality_data(
                             message,
                             self.bot,
                             air_quality_data,
                             self.model.interpret_aqi
                         )
+                        self.db.insert_user(message.from_user.username, aqi)
+
+                        df = self.db.get_all_data()
+
+                        df['registration_date'] = df['registration_date'] + f'-{datetime.now().year}'
+                        df['registration_date'] = pd.to_datetime(df['registration_date'], format='%m-%d-%Y')
+                        df['aqi_levels'] = pd.to_numeric(df['aqi_levels'])
+                        df['label'] = df['registration_date'].dt.strftime('%m-%d')
+
+                        plt.figure(figsize=(10, 5))
+                        plt.bar(df['label'], df['aqi_levels'], color='skyblue')
+                        plt.title('AQI уровни по дате регистрации')
+                        plt.xlabel('Дата (MM-DD)')
+                        plt.ylabel('AQI уровень')
+                        plt.xticks(rotation=45)
+                        plt.grid(axis='y')
+                        plt.tight_layout()
+
+                        image_path = f"aqi_chart_{message.from_user.username}.png"
+                        plt.savefig(image_path)
+                        plt.close()
+
+                        with open(image_path, 'rb') as photo:
+                            self.bot.send_photo(message.chat.id, photo, caption="Ваш график AQI 📈")
                         print("Гео")
             if message.text == "Отправляй качество воздуха раз в день":
                 self.view.send_day(message, self.bot)
@@ -79,4 +104,3 @@ class AirQualityController:
                             time.sleep(86400)
 
                             print("Гео 5")
-
