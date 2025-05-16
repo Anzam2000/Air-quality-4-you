@@ -5,5 +5,8 @@ from controllers import AirQualityController
 bot = telebot.TeleBot(BOT_TOKEN)
 controller = AirQualityController(bot, WEATHER_API_KEY)
 
-if __name__ == "__main__":
+
+def start_bot():
     bot.polling()
+def stop_bot():
+    bot.stop_polling()
