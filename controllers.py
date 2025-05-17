@@ -1,25 +1,30 @@
 from models import *
 from views import AirQualityView
 import time
-from datetime import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 
 class AirQualityController:
-    def __init__(self, bot, api_key):
+    def __init__(self, bot, api_key, tk_controller=None):
         self.db = DataBase()
         self.bot = bot
         self.model = AirQualityModel(api_key)
         self.view = AirQualityView()
+        self.tk_controller = tk_controller
         self.setup_handlers()
 
+    def log_to_tkinter(self, message):
+        if self.tk_controller:
+            self.tk_controller.add_log_message(message)
     def setup_handlers(self):
         @self.bot.message_handler(commands=['start'])
         def handle_start(message):
+            self.log_to_tkinter(message.text)
             self.view.send_welcome(message, self.bot)
 
         @self.bot.message_handler(content_types=['text'])
         def handle_location(message):
+            self.log_to_tkinter(message.text)
             if message.text == "Отправляй качество воздуха только сейчас":
                 self.view.send(message, self.bot)
 
@@ -28,6 +33,7 @@ class AirQualityController:
                     if message.location:
                         lat = message.location.latitude
                         lon = message.location.longitude
+                        self.log_to_tkinter(f"{lat}{lon}")
                         air_quality_data = self.model.get_air_quality(lat, lon)
                         aqi = air_quality_data["list"][0]["main"]["aqi"]
                         self.view.send_air_quality_data(
@@ -36,9 +42,8 @@ class AirQualityController:
                             air_quality_data,
                             self.model.interpret_aqi
                         )
-
+                        self.log_to_tkinter(message.text)
                         self.db.insert_user(message.from_user.id, message.from_user.username, aqi)
-
                         df = self.db.get_all_data()
                         df['registration_date'] = pd.to_datetime(df['registration_date'], format='%m-%d %H:%M')
                         df['aqi_levels'] = pd.to_numeric(df['aqi_levels'])
@@ -104,3 +109,4 @@ class AirQualityController:
 
                             time.sleep(86400)
                             print("Гео 5")
+
