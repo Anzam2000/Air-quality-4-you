@@ -33,7 +33,8 @@
     Люди с заболеваниями дыхательной системы (астма, аллергия).
 # Схема проекта
 
-![Air-quality-4-you drawio(3)](https://github.com/user-attachments/assets/266bb072-424b-4f35-9559-b7fe6f858dbc)
+![photo_2025-05-24_16-52-35](https://github.com/user-attachments/assets/bf5e0620-a85a-4e53-bf57-411a16524872)
+
 
 
 
